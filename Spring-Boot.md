@@ -248,10 +248,6 @@ public class Application {
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class ApplicationTest {
-
-    @Autowired
-    JdbcTemplate template;
-
     @Autowired
     UserMapper mapper;
 

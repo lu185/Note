@@ -926,13 +926,164 @@ new Vue({
 
 
 
+##  组件基础
+
+### 组件注册
+
+#### 全局注册
+
+```html
+<div id="app">
+  <button-counter></button-counter>
+</div>
+```
+
+```js
+Vue.component('button-counter', {
+  data: function () {
+    return {
+      count: 0
+    }
+  },
+  template: '<button v-on:click="count++">点击了 {{ count }} 次</button>'
+})
+
+var app = new Vue({
+    el:"#app"
+})
+```
+
+#### 局部注册
+
+```html
+<div id="app">
+  <button-counter></button-counter>
+</div>
+```
+
+```js
+var app = new Vue({
+    el:"#app",
+    components:{
+        'button-counter':{
+            data: function () {
+                return {
+                  count: 0
+                }
+ 			},
+            template: '<button v-on:click="count++">点击了 {{ count }} 次</button>'
+        }
+    }
+})
+```
 
 
 
+### 通过`props`向组件传递数据
 
+```html
+<div id="app">
+  <say name="five"></say>
+  <say name="root"></say>
+  <say name="admin"></say>
+</div>
+```
 
+```js
+Vue.component('say', {
+  props: ['name'],
+  template: '<h3> 你好 {{ name }}</h3>'
+})
 
+var app = new Vue({
+    el: "#app"
+})
+```
 
+### 监听子组件事件
+
+```html
+<div id="app">
+	<click v-on:say="say"></click>
+</div>
+```
+
+```js
+Vue.component('click', {
+  template: `<button v-on:click="$emit('say')">click me</button>`
+})
+
+var app = new Vue({
+    el: "#app",
+    methods: {
+        say: function(){
+            alert("你好")
+        }
+    }
+})
+```
+
+### 事件抛值
+
+```html
+<div id="app">
+	<click v-on:say="say($event)"></click>
+</div>
+```
+
+```js
+Vue.component('click', {
+  template: `<button v-on:click="$emit('say','ok')">click me</button>`
+})
+
+var app = new Vue({
+    el: "#app",
+    methods: {
+        say: function(e){
+            alert(e)
+        }
+    }
+})
+```
+
+### 传递标签的内容 `<slot></slot>`
+
+```html
+<div id="app">
+	<click>click me</click>
+</div>
+```
+
+```js
+Vue.component('click', {
+  template: `<button><slot></slot></button>`
+})
+
+var app = new Vue({
+    el: "#app"
+})
+```
+
+### 动态组件
+
+```html
+<div id="app">
+    <component v-bind:is="component"></component>
+</div>
+```
+
+```js
+Vue.component('click', {
+    template: `<button><slot></slot></button>`
+})
+
+var app = new Vue({
+    el: "#app",
+    data:{
+        component: 'click'
+    }
+})
+```
 
 
 

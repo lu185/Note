@@ -8,8 +8,6 @@
 | `MySQL` | `com.mysql.jdbc.Driver`| `jdbc:mysql://localhost:port/dbname` |
 | `SQL2008` | `com.microsoft.sqlserver.jdbc.SQLServerDriver` | `jdbc:sqlserver://localhost:port;databaseName=dbname`|
 
-# 
-
 
 # BaseDB
 ```java
