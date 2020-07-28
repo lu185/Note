@@ -62,7 +62,7 @@ set expandtab
 set autoindent
 ```
 
-# sougoupingyin
+# 搜狗拼音
 ```
 # pacman -S base-devel
 
@@ -80,119 +80,28 @@ qtconfig-qt4
 ```
 
 
-# ` pacman`命令
 
-1、列出已经安装的软件包
+# ubuntu 命令行与图形化模式切换
 
-pacman -Q
- 
 
-2、查看sqlmap包是否已经安装
 
-pacman -Q sqlmap
- 
+一、开机默认进入命令行模式
 
-3、查看已安装的包sqlmap的详细信息
+1、输入命令：sudo systemctl set-default multi-user.target 
 
-pacman -Qi sqlmap
- 
+2、重启：sudo reboot
 
-4、列出已安装包sqlmap的所有文件
+要进入图形界面，只需要输入命令startx
 
-pacman -Ql sqlmap
- 
+从图形界面切换回命令行：ctrl+alt+F7
 
-5、查找某个文件属于哪个包？
+二、开机默认进入图形用户界面
 
-pacman -Qo /etc/passwd
- 
+1、输入命令：sudo systemctl set-default graphical.target 
 
-6、查询包组
+2、重启：reboot
 
-pacman -Sg
- 
+要进入命令行模式：ctrl+alt+F2
 
-7、查询包组所包含的软件包
+从命令行切换到图形界面：ctrl+alt+F7
 
-pacman -Sg blackarch
- 
-
-8、搜索sqlmap相关的包
-
-pacman -Ss sqlmap
- 
-
-9、从数据库中搜索sqlmap的信息
-
-pacman -Si sqlmap
- 
-
-10、仅同步源
-
-sudo pacman -Sy
- 
-
-10、更新系统
-
-sudo pacman -Su
- 
-
-11、同步源并更新系统
-
-sudo pacman -Syu
- 
-
-12、同步源后安装sqlmap包
-
-sudo pacman -Sy sqlmap
- 
-
-13、从本地数据库中获取sqlmap的信息，并下载安装
-
-sudo pacman -S sqlmap
- 
-
-14、强制安装sqlmap包
-
-sudo pacman -Sf sqlmap
- 
-
-15、删除sqlmap
-
-sudo pacman -R sqlmap
- 
-
-16、强制删除被依赖的包（慎用）
-
-sudo pacman -Rd sqlmap
- 
-
-17、删除sqlmap包及依赖其的包
-
-sudo pacman -Rc sqlmap
- 
-
-18、删除sqlmap包及其依赖的包
-
-sudo pacman -Rsc sqlmap
- 
-
-19、清理/var/cache/pacman/pkg目录下的旧包
-
-sudo pacman -Sc
- 
-
-20、清除所有下载的包和数据库
-
-sudo pacman -Scc
- 
-
-21、安装下载的virtualbox包（有时候需要降级包的时候就用这个）
-
-cd /var/cache/pacman/pkgsudo
-pacman -U virtualbox-5.2.12-1-x86_64.pkg.tar.xz
- 
-
-22、升级时不升级sqlmap包
-
-sudo pacman -Su --ignore sqlmap

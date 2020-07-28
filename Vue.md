@@ -1074,7 +1074,7 @@ var app = new Vue({
 
 ```js
 Vue.component('click', {
-    template: `<button><slot></slot></button>`
+    template: `<button>click me</button>`
 })
 
 var app = new Vue({
