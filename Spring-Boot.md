@@ -1,6 +1,6 @@
 # `Spring-Boot`
 
-## 基础配置
+## `Spring-Boot`基础配置
 
 ### `pom.xml`配置
 
@@ -59,9 +59,7 @@ server.port=185
 server.servlet.context-path=/SpringBootApplicaiton
 ```
 
-
-
-## 启动`Spring-Boot应用`
+### 启动`Spring-Boot应用`
 
 ```java
 @SpringBootApplication
@@ -83,7 +81,7 @@ public class Application {
 ### `pom.xml`配置
 
 ```xml
- <!-- MySQL 连接器 -->
+<!-- MySQL 连接器 -->
 <dependency>
     <groupId>mysql</groupId>
     <artifactId>mysql-connector-java</artifactId>
@@ -165,17 +163,11 @@ public class SpringJDBCTest {
 ### `pom.xml`配置
 
 ```xml
- <!-- MySQL 连接器 -->
+<!-- MySQL 连接器 -->
 <dependency>
     <groupId>mysql</groupId>
     <artifactId>mysql-connector-java</artifactId>
     <version>5.1.45</version>
-</dependency>
-
-<!-- Spring-JDBC 启动器 -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-jdbc</artifactId>
 </dependency>
 
 <!-- MyBatis 启动器 -->
@@ -304,17 +296,11 @@ public class ApplicationTest {
 ### `pom.xml`配置
 
 ```xml
- <!-- MySQL 连接器 -->
+<!-- MySQL 连接器 -->
 <dependency>
     <groupId>mysql</groupId>
     <artifactId>mysql-connector-java</artifactId>
     <version>5.1.45</version>
-</dependency>
-
-<!-- Spring-JDBC 启动器 -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-jdbc</artifactId>
 </dependency>
 
 <!-- MyBatis-Plus 启动器 -->
@@ -483,6 +469,86 @@ public class Application {
 	}
 }
 ```
+
+
+
+
+
+# `MyBatis-Plus`
+
+## 代码生成器
+
+```java
+package com.utils;
+
+import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.generator.AutoGenerator;
+import com.baomidou.mybatisplus.generator.config.*;
+import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
+
+import java.util.Scanner;
+
+public class MyBatisPlusGenerator {
+
+    public static String scanner(String tip) {
+        Scanner scanner = new Scanner(System.in);
+        StringBuilder help = new StringBuilder();
+        help.append("请输入" + tip + "：");
+        System.out.println(help.toString());
+        if (scanner.hasNext()) {
+            String ipt = scanner.next();
+            if (StringUtils.isNotEmpty(ipt)) {
+                return ipt;
+            }
+        }
+        throw new MybatisPlusException("请输入正确的" + tip + "！");
+    }
+
+    public static void main(String[] args) {
+        AutoGenerator mpg = new AutoGenerator();
+        GlobalConfig gc = new GlobalConfig();
+        String projectPath = System.getProperty("user.dir");
+        gc.setOutputDir(projectPath + "/src/main/java");
+        gc.setAuthor("Five");
+        gc.setOpen(false);
+        mpg.setGlobalConfig(gc);
+
+        DataSourceConfig dsc = new DataSourceConfig();
+        dsc.setUrl("jdbc:mysql://localhost:3306/test?useUnicode=true&useSSL=false&characterEncoding=utf8");
+        dsc.setDriverName("com.mysql.jdbc.Driver");
+        dsc.setUsername("root");
+        dsc.setPassword("1=23.");
+        mpg.setDataSource(dsc);
+
+        PackageConfig pc = new PackageConfig();
+        pc.setModuleName(scanner("模块名"));
+        pc.setParent("com.test");
+        mpg.setPackageInfo(pc);
+
+        TemplateConfig templateConfig = new TemplateConfig();
+
+        templateConfig.setXml(null);
+        mpg.setTemplate(templateConfig);
+
+        StrategyConfig strategy = new StrategyConfig();
+        strategy.setNaming(NamingStrategy.underline_to_camel);
+        strategy.setColumnNaming(NamingStrategy.underline_to_camel);
+        strategy.setEntityLombokModel(true);
+        strategy.setRestControllerStyle(true);
+
+        strategy.setSuperEntityColumns("id");
+        strategy.setInclude(scanner("表名，多个英文逗号分割").split(","));
+        strategy.setControllerMappingHyphenStyle(true);
+        strategy.setTablePrefix(pc.getModuleName() + "_");
+        mpg.setStrategy(strategy);
+        mpg.execute();
+    }
+}
+
+```
+
+
 
 
 
