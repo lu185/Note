@@ -474,6 +474,206 @@ public class Application {
 
 
 
+
+
+## `Spring-Boot`文件上传
+
+### 封装`UploadFile`组件
+
+```java
+@Component
+public class UploadFile {
+
+    private String uploadPath;
+    private MultipartFile file;
+    private String fileName;
+    private String url;
+
+    public UploadFile setUploadPath(String uploadPath) {
+        if( uploadPath.endsWith("/") ){
+            this.uploadPath = uploadPath;
+        }else{
+            this.uploadPath = uploadPath+"/";
+        }
+        return this;
+    }
+
+    public UploadFile setFile(MultipartFile file) {
+        this.file = file;
+        return this;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public String getUrl() {
+        return this.url = this.uploadPath+this.fileName;
+    }
+
+    public boolean upload(){
+        String fileName = UUID.randomUUID()+"=-="+file.getOriginalFilename();
+        File file1 = new File(uploadPath+fileName);
+        if( !file1.exists() ){
+            file1.mkdirs();
+        }
+        try {
+            file.transferTo(file1);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        this.fileName = file1.getName();
+        return true;
+    }
+
+    public boolean upload( String uploadPath, MultipartFile file ){
+        this.setUploadPath(uploadPath);
+        this.setFile(file);
+        return this.upload();
+    }
+
+}
+```
+
+### 创建资源映射配置类
+
+```java
+@Configuration
+public class MyWebMvcConfigurer implements WebMvcConfigurer {
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/imgs/**").
+                addResourceLocations("file:/D:/AAA/");
+    }
+}
+```
+
+
+
+### 创建控制器
+
+```java
+@Controller
+public class Upload {
+
+    @Autowired
+    UploadFile uploadFile;
+
+    @RequestMapping("/upload")
+    @ResponseBody
+    public String upload( @RequestParam("file")MultipartFile file ){
+        String url = "D:/AAA";
+
+        uploadFile.upload(url,file);
+
+        return "Upload Success "+uploadFile.getFileName();
+    }
+
+    @RequestMapping("file")
+    public String toUpload(){
+        return "file";
+    }
+
+}
+```
+
+### 编写`file.html`页面
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input id="file" type="file" name="file">
+        <input type="submit">
+    </form>
+</body>
+</html>
+```
+
+
+
+
+
+
+
+## `Spring-Boot`文件下载
+
+### 封装`DownloadFile`组件
+
+```java
+@Component
+public class DownloadFile {
+
+    public ResponseEntity<FileSystemResource> download(String url){
+        File file = new File(url);
+        return this.download(file);
+    }
+
+    public ResponseEntity<FileSystemResource> download(File file) {
+        if (file == null) {
+            return null;
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Content-Disposition", "attachment; filename=" + file.getName());
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+        headers.add("Last-Modified", new Date().toString());
+        headers.add("ETag", String.valueOf(System.currentTimeMillis()));
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(new FileSystemResource(file));
+    }
+}
+```
+
+### 创建控制器
+
+```java
+@Controller
+public class Upload {
+
+    @Autowired
+    DownloadFile downloadFile;
+
+    @RequestMapping("/download")
+    public ResponseEntity<FileSystemResource> dowload(HttpServletResponse response){
+        String url = this.getClass().getClassLoader().getResource("").getPath()+"imgs/1.jpg";
+
+        return downloadFile.download(new File(url));
+    }
+
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # `MyBatis-Plus`
 
 ## 代码生成器
