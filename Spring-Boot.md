@@ -476,6 +476,166 @@ public class Application {
 
 
 
+## `Spring-Boot`整合`Security`
+
+### `pom.xml`配置
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+```
+
+### 配置默认用户名和密码
+
+```properties
+spring.security.user.name=five
+spring.security.user.password=1=23.
+```
+
+### 编写`Security`的配置类
+
+```java
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .antMatchers("/index")
+                .permitAll()	// index 请求所有角色可访问
+                .antMatchers("/vip1/**").hasAnyRole("vip1") // vip1 角色权限
+                .antMatchers("/vip2/**").hasAnyRole("vip2")
+                .antMatchers("/vip3/**").hasAnyRole("vip3");
+
+        http.csrf().disable();	// 关闭 crsf攻击 检测
+        
+        http.formLogin()
+                .loginPage("/tologin")	// 设置登录页面
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .loginProcessingUrl("/login");  // 设置登录的请求
+        
+        http.logout().logoutSuccessUrl("/index"); // 用户退出后跳转的页面
+        
+        http.rememberMe(); // 记住我
+    }
+
+    
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication()
+                .passwordEncoder(new BCryptPasswordEncoder()) // 设置密码加密方式
+                .withUser("Five")	// 用户名
+                .password(new BCryptPasswordEncoder().encode("1=23.")) // 密码
+                .roles("vip1","vip2","vip3") //权限
+                .and()	// 使用 and 连接添加多个用户 
+                .withUser("root")
+                .password(new BCryptPasswordEncoder().encode("1=23."))
+                .roles("vip2");
+    }
+}
+```
+
+### 创建控制器
+
+```java
+@Controller
+public class SecurityTest {
+
+    @RequestMapping("index")
+    public String index(){
+        return "index";
+    }
+
+    @RequestMapping("tologin")
+    public String tologin(){
+        return "login";
+    }
+
+    @RequestMapping("vip1/{page}")
+    @Response
+    public String vip1(@PathVariable String page){
+        return "This is the "+ page +" page for VIP1";
+    }
+    @RequestMapping("vip2/{page}")
+    @Response
+    public String vip2(@PathVariable String page){
+        return "This is the "+ page +" page for VIP2";
+    }
+    @RequestMapping("vip3/{page}")
+    @Response
+    public String vip3(@PathVariable String page){
+        return "This is the "+ page +" page for VIP3";
+    }
+}
+
+```
+
+### 登录页面
+
+```html
+<form action="/login" method="post">
+    <table>
+        <tr>
+            <td>用户名</td>
+            <td>
+                <input type="text" name="username">
+            </td>
+        </tr>
+        <tr>
+            <td>密码</td>
+            <td>
+                <input type="password" name="password">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="submit">
+            </td>
+        </tr>
+    </table>
+</form>
+```
+
+### 首页
+
+```html
+<h1>首页</h1>
+<hr>
+<h2>VIP1</h2>
+<ul>
+    <li><a href="/vip1/1">to like 1</a></li>
+    <li><a href="/vip1/2">to like 2</a></li>
+    <li><a href="/vip1/3">to like 3</a></li>
+</ul>
+<hr>
+<h2>VIP2</h2>
+<ul>
+    <li><a href="/vip2/1">to like 1</a></li>
+    <li><a href="/vip2/2">to like 2</a></li>
+    <li><a href="/vip2/3">to like 3</a></li>
+</ul>
+<hr>
+<h2>VIP3</h2>
+<ul>
+    <li><a href="/vip3/1">to like 1</a></li>
+    <li><a href="/vip3/2">to like 2</a></li>
+    <li><a href="/vip3/3">to like 3</a></li>
+</ul>
+```
+
+
+
+
+
+
+
 ## `Spring-Boot`文件上传
 
 ### 封装`UploadFile`组件
@@ -512,6 +672,9 @@ public class UploadFile {
     }
 
     public boolean upload(){
+        if("".equals(file.getOriginalFilename())){
+            return false;
+        }
         String fileName = UUID.randomUUID()+"=-="+file.getOriginalFilename();
         File file1 = new File(uploadPath+fileName);
         if( !file1.exists() ){
