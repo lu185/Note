@@ -347,7 +347,6 @@ public class User{
 ```java
 package com.mappers;
 
-@Mapper
 public interface UserMapper extends BaseMapper<User>{
     
 }
@@ -541,6 +540,100 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 }
 ```
+
+### 编写基于数据库的`Security`的配置类
+
+编写实体类
+
+```java
+@TableName("userinfo")
+public class UserInfo {
+    private Integer userId;
+    private String username;
+    private String password;
+    private String role;
+    
+    // Add Getter and Setter ..
+        
+    // Override toString ..
+}
+```
+
+编写`Mapper`
+
+```java
+@Mapper
+public interface UserInfoMapper extends BaseMapper<UserInfo> {
+}
+```
+
+
+
+编写`UserDetailsServiceImpl`
+
+```java
+@Service
+public class UserDetailsServiceImpl implements UserDetailsService {
+
+    @Autowired
+    UserInfoMapper userInfoMapper;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Map where = new HashMap<String,Object>();
+        where.put("username",username);
+
+        UserInfo userInfo = userInfoMapper.selectOne( new QueryWrapper<>().allEq(where));
+
+        if( userInfo == null ){
+            return null;
+        }else{
+            Collection<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority(userInfo.getRole()));
+            User user = new User(userInfo.getUsername(), new BCryptPasswordEncoder().encode(userInfo.getPassword()),authorities);
+            System.out.println("管理员信息："+user.getUsername()+"   "+new BCryptPasswordEncoder().encode(userInfo.getPassword())+"  "+user.getAuthorities());
+            return user;
+        }
+    }
+}
+```
+
+### 编写配置类
+
+```java
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .antMatchers("/index")
+                .permitAll()
+                .antMatchers("/vip1/**").hasAnyAuthority("vip1")
+                .antMatchers("/vip2/**").hasAnyAuthority("vip2")
+                .antMatchers("/vip3/**").hasAnyAuthority("vip3");
+
+        http.csrf().disable();
+        http.formLogin()
+                .loginPage("/tologin")
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .loginProcessingUrl("/login");
+
+        http.logout().logoutSuccessUrl("/index");
+    }
+
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
+
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+    }
+}
+```
+
+
 
 ### 创建控制器
 
