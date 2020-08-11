@@ -475,6 +475,29 @@ public class Application {
 
 
 
+## `Spring-Boot`整合`thymeleaf`
+
+### `pom.xml`配置
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+```
+
+### `html`头部约束
+
+```html
+<html xmlns:th="http://www.thymeleaf.org">
+```
+
+
+
+
+
+
+
 ## `Spring-Boot`整合`Security`
 
 ### `pom.xml`配置
